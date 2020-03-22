@@ -59,7 +59,7 @@ class SfcAgentRpcClient(object):
     def ask_agent_to_update_flow_rules(self, context, flow_rule):
         LOG.debug('Ask agent on the specific host to update flows ')
         LOG.debug('flow_rule: %s', flow_rule)
-        host = flow_rule.get('host')
+        host = flow_rule.get('host_id')
         cctxt = self.client.prepare(
             topic=topics.get_topic_name(
                 self.topic, sfc_topics.PORTFLOW, topics.UPDATE),
@@ -69,7 +69,7 @@ class SfcAgentRpcClient(object):
     def ask_agent_to_delete_flow_rules(self, context, flow_rule):
         LOG.debug('Ask agent on the specific host to delete flows ')
         LOG.debug('flow_rule: %s', flow_rule)
-        host = flow_rule.get('host')
+        host = flow_rule.get('host_id')
         cctxt = self.client.prepare(
             topic=topics.get_topic_name(
                 self.topic, sfc_topics.PORTFLOW, topics.DELETE),

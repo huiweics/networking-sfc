@@ -1378,7 +1378,7 @@ class OVSSfcDriver(driver_base.SfcDriverBase,
 
     def _update_portchain_group_reference_count(self, flow_rule, host):
         group_refcnt = 0
-        flow_rule['host'] = host
+        flow_rule['host_id'] = host
 
         if flow_rule['next_group_id'] is not None:
             all_nodes = self.get_path_nodes_by_filter(
@@ -1391,7 +1391,7 @@ class OVSSfcDriver(driver_base.SfcDriverBase,
                             group_refcnt += 1
 
             port_details = self.get_port_details_by_filter(
-                dict(host_id=flow_rule['host']))
+                dict(host_id=flow_rule['host_id']))
             if port_details is not None:
                 for pd in port_details:
                     for path in pd['path_nodes']:
@@ -1737,7 +1737,7 @@ class OVSSfcDriver(driver_base.SfcDriverBase,
                         _port['egress'] or _port['ingress'])
                     flowrule.update(egress=None,
                                     ingress=ingress_port,
-                                    host=_port['host_id'],
+                                    host_id=_port['host_id'],
                                     pp_corr=_port['correlation'],
                                     tap_enabled=True)
                     flowrule_list.append(flowrule.copy())
