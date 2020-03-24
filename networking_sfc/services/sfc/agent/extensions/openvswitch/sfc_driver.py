@@ -399,7 +399,9 @@ class SfcOVSAgentDriver(sfc.SfcAgentDriver):
                 buckets.append(bucket)
                 subnet_actions_list = []
 
-                across_flow = "mod_vlan_vid:%d," % vlan
+                across_flow = ''
+                if vlan:
+                    across_flow = "mod_vlan_vid:%d," % vlan
                 # the classic encapsulation of packets in ACROSS_SUBNET_TABLE
                 # is kept unchanged for the same scenarios, i.e. when the next
                 # hops don't support encapsulation and neither the current one.
@@ -523,11 +525,13 @@ class SfcOVSAgentDriver(sfc.SfcAgentDriver):
                     match_inport=True)
 
     def _get_vlan_by_port(self, port_id):
-        try:
-            net_uuid = self.vlan_manager.get_net_uuid(port_id)
-            return self.vlan_manager.get(net_uuid).vlan
-        except (vlanmanager.VifIdNotFound, vlanmanager.MappingNotFound):
-            return None
+        vif_port = self.br_int.get_vif_port_by_id(port_id)
+        if vif_port:
+            port_name = vif_port.port_name
+            vlans = self.br_int.get_port_tag_dict()
+            if port_name in vlans:
+                return vlans[port_name]
+        return None
 
     def _setup_ingress_flow_rules(self, flowrule):
         vif_port = self.br_int.get_vif_port_by_id(flowrule['ingress'])
@@ -705,7 +709,8 @@ class SfcOVSAgentDriver(sfc.SfcAgentDriver):
         tap_action = ""
         if flowrule['pc_corr'] == 'mpls':
             tap_action += self._build_push_mpls(item['nsp'], item['nsi'])
-        tap_action += "mod_vlan_vid:%d," % vlan
+        if vlan:
+            tap_action += "mod_vlan_vid:%d," % vlan
         subnet_actions_list[0] = tap_action
         ovs_rule = dict()
 
